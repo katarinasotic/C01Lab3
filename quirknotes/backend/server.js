@@ -145,3 +145,15 @@ app.patch("/patchNote/:noteId", express.json(), async (req, res) => {
     res.status(500).json({error: error.message})
   }
 })
+
+// Added functionality
+app.delete("/deleteAllNotes", express.json(), async (req, res) => {
+  try {
+    // Find all notes
+    const collection = db.collection(COLLECTIONS.notes);
+    const data = await collection.deleteAll({});
+    res.json({response: `${data.deletedCount} deleted.`});
+  } catch(error) {
+    res.status(500).json({ error: error.message })
+  }
+})

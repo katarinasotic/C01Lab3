@@ -55,7 +55,29 @@ function Dialog({open, initialNote, closeDialog, postNote: postNoteState}) {
     }
 
     const patchNote = (entry) => {
-        // Code for PATCH here
+        setStatus("Currently patching the note")
+        try {
+            fetch("http://localhost:4000/patchNote/" + note._id,
+                {method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({title: note.title, content: note.content})} )
+            .then(async (response) => {
+                if (!response.ok) {
+                    setStatus("Patch Unsuccessful")
+                    console.log("Patch failed:", response.status)
+                } else {
+                    await response.json().then((data) => {
+                        patchNoteState(note._id, note.title, note.content);
+                        setStatus("Patch Successful!")
+                    }) 
+                }
+            })
+        } catch (error) {
+            setStatus("Patch Unsuccessful")
+            console.log("Patch failed:", error)
+        } 
     }
 
     return (

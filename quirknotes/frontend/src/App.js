@@ -39,11 +39,41 @@ function App() {
   }, [])
 
   const deleteNote = (entry) => {
-    // Code for DELETE here
+    try {
+      fetch("http://localhost:4000/deleteNote/" + entry._id,  {method: "DELETE"})
+      .then(async (response) => {
+        if (!response.ok) {
+          console.log("Server failed:", response.status);
+          alert('Unable to delete the note');
+        } else {
+            await response.json().then((data) => {
+            deleteNoteState(entry._id);
+        }) 
+        }
+      })
+    } catch (error) {
+      console.log("Server failed:", error);
+      alert('Unable to delete the note');
+    }
   }
 
   const deleteAllNotes = () => {
-    // Code for DELETE all notes here
+    try {
+      fetch("http://localhost:4000/deleteAllNotes",  {method: "DELETE"})
+      .then(async (response) => {
+        if (!response.ok) {
+          console.log("Server failed:", response.status);
+          alert('Unable to delete all notes');
+        } else {
+            await response.json().then((data) => {
+              deleteAllNotesState();
+        }) 
+        }
+      })
+    } catch (error) {
+      console.log("Server failed:", error);
+      alert('Unable to delete all notes');
+    }
   }
 
   
@@ -73,15 +103,20 @@ function App() {
   }
 
   const deleteNoteState = () => {
-    // Code for modifying state after DELETE here
+    setNotes((prevNotes) => prevNotes.filter((note) => {return note._id !== _id}));
   }
 
   const deleteAllNotesState = () => {
-    // Code for modifying state after DELETE all here
+    setNotes([]);
   }
 
   const patchNoteState = (_id, title, content) => {
-    // Code for modifying state after PATCH here
+    setNotes((prevNotes) => {
+      let i = prevNotes.findIndex(note => note._id === _id);
+      prevNotes[i].title = title;
+      prevNotes[i].content = content;
+      return prevNotes;
+    });
   }
 
   return (
@@ -130,7 +165,7 @@ function App() {
           initialNote={dialogNote}
           closeDialog={closeDialog}
           postNote={postNoteState}
-          // patchNote={patchNoteState}
+          patchNote={patchNoteState}
           />
 
       </header>
